@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/iv_step_thumbnail"
+        android:layout_height="80dp"
+        android:layout_width="wrap_content"
+        android:adjustViewBounds="true"
+        android:paddingStart="0dp"
+        android:paddingEnd="8dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_photo_placeholder_24dp"
+        android:contentDescription="@string/content_description_step_thumbnail"/>
+
+    <TextView
+        android:id="@+id/tv_step_short_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="80dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/placeholder_step_short_description"
+        android:textSize="20sp"
+        android:gravity="center_vertical"/>
+
+</LinearLayout>

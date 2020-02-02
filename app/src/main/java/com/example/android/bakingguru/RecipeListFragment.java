@@ -2,7 +2,6 @@ package com.example.android.bakingguru;
 
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -23,12 +22,16 @@ import butterknife.Unbinder;
 
 public class RecipeListFragment extends Fragment implements RecipeAdapter.RecipeAdapterOnClickHandler {
 
+    private static final String SAVE_INSTANCE_GRID_COLS = "save_instance_grid_cols";
+
     public static final String INTENT_RECIPE_ID = "INTENT_RECIPE_ID";
 
     @BindView(R.id.rv_recipes) RecyclerView mRecyclerView;
     private Unbinder unbinder;
 
     private RecipeAdapter mRecipeAdapter;
+
+    private int mGridCols;
 
     public RecipeListFragment() {
         // Required empty public constructor
@@ -42,7 +45,11 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
 
         unbinder = ButterKnife.bind(this, rootView);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(rootView.getContext(), getRequiredGridCols());
+        if (savedInstanceState != null) {
+            mGridCols = savedInstanceState.getInt(SAVE_INSTANCE_GRID_COLS);
+        }
+
+        GridLayoutManager layoutManager = new GridLayoutManager(rootView.getContext(), mGridCols);
         mRecyclerView.setLayoutManager(layoutManager);
 
         mRecipeAdapter = new RecipeAdapter(this);
@@ -55,12 +62,11 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
     }
 
     /**
-     * This function returns the number of columns for grid layout
-     * - 2 columns for portrait and 3 columns for landscape layout
-     * @return number of columns for grid layout
+     * This function sets the number of columns for grid layout
+     * @param gridCols Number of columns for the grid layout
      */
-    private int getRequiredGridCols() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 1 : 2;
+    void setGridCols(int gridCols) {
+        mGridCols = gridCols;
     }
 
     /**
@@ -72,6 +78,14 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
         final Intent intent = new Intent(this.getContext(), RecipeDetailActivity.class);
         intent.putExtra(INTENT_RECIPE_ID, recipe.getId());
         startActivity(intent);
+    }
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle currentState) {
+        currentState.putInt(SAVE_INSTANCE_GRID_COLS, mGridCols);
     }
 
     @Override

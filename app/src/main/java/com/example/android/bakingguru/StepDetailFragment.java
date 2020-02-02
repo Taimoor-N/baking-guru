@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.example.android.bakingguru.database.Step;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -26,6 +27,9 @@ import butterknife.Unbinder;
  * A simple {@link Fragment} subclass.
  */
 public class StepDetailFragment extends Fragment implements View.OnClickListener {
+
+    private static final String SAVE_INSTANCE_RECIPE_STEPS = "save_instance_recipe_steps";
+    private static final String SAVE_INSTANCE_CURRENT_STEP = "save_instance_current_step";
 
     @BindView(R.id.iv_to_be_replaced_by_video) ImageView mStepImage;
     @BindView(R.id.tv_step_detail_description) TextView mStepDescription;
@@ -49,6 +53,11 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
         View rootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
 
         unbinder = ButterKnife.bind(this, rootView);
+
+        if (savedInstanceState != null) {
+            mRecipeSteps = (ArrayList<Step>) savedInstanceState.getSerializable(SAVE_INSTANCE_RECIPE_STEPS);
+            mCurrentStep = (Step) savedInstanceState.getSerializable(SAVE_INSTANCE_CURRENT_STEP);
+        }
 
         mStepImage.setImageResource(R.drawable.ic_videocam_placeholder_24dp);
         mStepDescription.setText(mCurrentStep.getDescription());
@@ -118,6 +127,15 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
             intent.putExtra(RecipeDetailFragment.INTENT_CURRENT_STEP, mRecipeSteps.get(currentStepPosition + 1));
             startActivity(intent);
         }
+    }
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle currentState) {
+        currentState.putSerializable(SAVE_INSTANCE_RECIPE_STEPS, mRecipeSteps);
+        currentState.putSerializable(SAVE_INSTANCE_CURRENT_STEP, mCurrentStep);
     }
 
     @Override

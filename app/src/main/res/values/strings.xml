@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Baking Guru</string>
+    <string name="content_description_recipe_card_thumbnail">This image shows recipe thumbnail</string>
+    <string name="content_description_step_thumbnail">This image shows thumbnail for recipe preparation step</string>
+    <string name="placeholder_recipe_card_name">Cheesecake</string>
+    <string name="placeholder_recipe_card_servings_value">16</string>
+    <string name="placeholder_recipe_card_steps_value">8</string>
+    <string name="placeholder_recipe_detail_ingredients">Sugar, salt, black pepper, onions, tomatoes, cucumber, cream (20%), eggs, water and everything nice</string>
+    <string name="placeholder_step_detail_button_next">NEXT ></string>
+    <string name="placeholder_step_detail_button_previous">&lt; PREVIOUS</string>
+    <string name="placeholder_step_detail_description">Step 2. Whisk the graham cracker crumbs, 50 grams (1/4 cup) of sugar, and 1/2 teaspoon of salt together in a medium bowl. Pour the melted butter and 1 teaspoon of vanilla into the dry ingredients and stir together until evenly mixed.</string>
+    <string name="placeholder_step_short_description">Prep the cookie crust.</string>
+    <string name="recipe_card_servings_text">Servings:</string>
+    <string name="recipe_card_steps_text">Preparation Steps:</string>
+    <string name="recipe_detail_ingredients_heading">INGREDIENTS</string>
+    <string name="recipe_detail_ingredients">%d %s of %s</string>
+    <string name="recipe_detail_preparation_steps_heading">PREPARATION STEPS</string>
 </resources>

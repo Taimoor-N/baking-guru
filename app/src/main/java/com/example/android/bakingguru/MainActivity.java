@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
 
+import com.example.android.bakingguru.fragments.RecipeListFragment;
 import com.example.android.bakingguru.util.AppUtil;
 
 public class MainActivity extends AppCompatActivity {

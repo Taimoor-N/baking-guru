@@ -1,4 +1,4 @@
-package com.example.android.bakingguru;
+package com.example.android.bakingguru.fragments;
 
 
 import android.content.Intent;
@@ -13,9 +13,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.bakingguru.R;
+import com.example.android.bakingguru.StepDetailActivity;
 import com.example.android.bakingguru.database.Step;
+import com.example.android.bakingguru.fragments.RecipeDetailFragment;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -71,7 +73,7 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
      * This function populates all the steps associated to the Recipe when this fragment is created.
      * @param recipeSteps Recipe Steps.
      */
-    void setRecipeSteps(ArrayList<Step> recipeSteps) {
+    public void setRecipeSteps(ArrayList<Step> recipeSteps) {
         mRecipeSteps = recipeSteps;
     }
 
@@ -79,7 +81,7 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
      * This function populates the currently selected step when this fragment is created.
      * @param currentStep Selected recipe step.
      */
-    void setCurrentStep(Step currentStep) {
+    public void setCurrentStep(Step currentStep) {
         mCurrentStep = currentStep;
     }
 

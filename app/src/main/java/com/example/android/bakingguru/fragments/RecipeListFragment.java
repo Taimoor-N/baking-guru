@@ -1,4 +1,4 @@
-package com.example.android.bakingguru;
+package com.example.android.bakingguru.fragments;
 
 
 import android.content.Intent;
@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.bakingguru.R;
+import com.example.android.bakingguru.RecipeDetailActivity;
 import com.example.android.bakingguru.adapters.RecipeAdapter;
 import com.example.android.bakingguru.database.Recipe;
 import com.example.android.bakingguru.util.MockDataGenerator;
@@ -65,7 +67,7 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
      * This function sets the number of columns for grid layout
      * @param gridCols Number of columns for the grid layout
      */
-    void setGridCols(int gridCols) {
+    public void setGridCols(int gridCols) {
         mGridCols = gridCols;
     }
 

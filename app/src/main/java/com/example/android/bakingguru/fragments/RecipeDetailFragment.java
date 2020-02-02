@@ -1,4 +1,4 @@
-package com.example.android.bakingguru;
+package com.example.android.bakingguru.fragments;
 
 
 import android.content.Intent;
@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.bakingguru.R;
+import com.example.android.bakingguru.StepDetailActivity;
 import com.example.android.bakingguru.adapters.StepAdapter;
 import com.example.android.bakingguru.database.Ingredient;
 import com.example.android.bakingguru.database.Step;
@@ -108,7 +110,7 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
      * This function sets the Recipe ID when this fragment is created.
      * @param recipeId The ID of the Recipe for which the details should be displayed.
      */
-    void setRecipeId(int recipeId) {
+    public void setRecipeId(int recipeId) {
         mRecipeId = recipeId;
     }
 

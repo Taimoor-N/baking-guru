@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.android.bakingguru.database.Step;
+import com.example.android.bakingguru.fragments.RecipeDetailFragment;
+import com.example.android.bakingguru.fragments.RecipeListFragment;
+import com.example.android.bakingguru.fragments.StepDetailFragment;
 import com.example.android.bakingguru.util.AppUtil;
 
 import java.util.ArrayList;

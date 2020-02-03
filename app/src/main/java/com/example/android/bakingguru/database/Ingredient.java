@@ -17,6 +17,9 @@ public class Ingredient implements Serializable {
     private String measure;
 
     @Ignore
+    public Ingredient() {}
+
+    @Ignore
     public Ingredient(int recipeId, String name, int quantity, String measure) {
         this.recipeId = recipeId;
         this.name = name;

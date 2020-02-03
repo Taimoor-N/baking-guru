@@ -1,4 +1,4 @@
-package com.example.android.bakingguru;
+package com.example.android.bakingguru.fragments;
 
 
 import android.content.Intent;
@@ -13,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.bakingguru.R;
+import com.example.android.bakingguru.StepDetailActivity;
 import com.example.android.bakingguru.adapters.StepAdapter;
 import com.example.android.bakingguru.database.Ingredient;
 import com.example.android.bakingguru.database.Step;
-import com.example.android.bakingguru.util.MockDataGenerator;
+import com.example.android.bakingguru.model.BakingRecipesPojo;
+import com.example.android.bakingguru.util.Constants;
 
 import java.util.ArrayList;
 
@@ -30,13 +33,11 @@ import butterknife.Unbinder;
  */
 public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAdapterOnClickHandler {
 
-    public static final String INTENT_RECIPE_STEPS = "INTENT_RECIPE_STEPS";
-    public static final String INTENT_CURRENT_STEP = "INTENT_CURRENT_STEP";
-
     @BindView(R.id.rv_steps) RecyclerView mRecyclerView;
     @BindView(R.id.tv_recipe_detail_ingredients_list) TextView mRecipeIngredients;
 
     private int mRecipeId;
+    private BakingRecipesPojo mBakingRecipesPojo;
 
     private Unbinder unbinder;
     private StepAdapter mStepAdapter;
@@ -53,6 +54,11 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
 
         unbinder = ButterKnife.bind(this, rootView);
 
+        if (savedInstanceState != null) {
+            mBakingRecipesPojo = (BakingRecipesPojo) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO);
+            mRecipeId = savedInstanceState.getInt(Constants.SAVE_INSTANCE_RECIPE_ID);
+        }
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(rootView.getContext());
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -68,7 +74,7 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
     }
 
     private String getRecipeIngredients(int recipeId) {
-        ArrayList<Ingredient> ingredients = MockDataGenerator.createMockIngredients();
+        ArrayList<Ingredient> ingredients = mBakingRecipesPojo.getIngredients();
         ArrayList<Ingredient> matchingIngredients = new ArrayList<>();
         String recipeIngredients = "";
 
@@ -91,7 +97,7 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
     }
 
     private ArrayList<Step> getRecipeSteps(int recipeId) {
-        ArrayList<Step> steps = MockDataGenerator.createMockSteps();
+        ArrayList<Step> steps = mBakingRecipesPojo.getSteps();
         ArrayList<Step> matchingSteps = new ArrayList<>();
 
         // Isolate steps that match with the Recipe ID
@@ -108,8 +114,12 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
      * This function sets the Recipe ID when this fragment is created.
      * @param recipeId The ID of the Recipe for which the details should be displayed.
      */
-    void setRecipeId(int recipeId) {
+    public void setRecipeId(int recipeId) {
         mRecipeId = recipeId;
+    }
+
+    public void setBakingRecipesPojo(BakingRecipesPojo bakingRecipesPojo) {
+        mBakingRecipesPojo = bakingRecipesPojo;
     }
 
     /**
@@ -119,9 +129,19 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
     @Override
     public void onClick(Step step) {
         final Intent intent = new Intent(this.getContext(), StepDetailActivity.class);
-        intent.putExtra(INTENT_RECIPE_STEPS, getRecipeSteps(mRecipeId).toArray());
-        intent.putExtra(INTENT_CURRENT_STEP, step);
+        intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
+        intent.putExtra(Constants.INTENT_RECIPE_STEPS, getRecipeSteps(mRecipeId).toArray());
+        intent.putExtra(Constants.INTENT_CURRENT_STEP, step);
         startActivity(intent);
+    }
+
+    /**
+     * Save the current state of this fragment
+     */
+    @Override
+    public void onSaveInstanceState(Bundle currentState) {
+        currentState.putSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO, mBakingRecipesPojo);
+        currentState.putInt(Constants.SAVE_INSTANCE_RECIPE_ID, mRecipeId);
     }
 
     @Override

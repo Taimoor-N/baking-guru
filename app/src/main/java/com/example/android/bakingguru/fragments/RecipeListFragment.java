@@ -1,4 +1,4 @@
-package com.example.android.bakingguru;
+package com.example.android.bakingguru.fragments;
 
 
 import android.content.Intent;
@@ -12,9 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.bakingguru.R;
+import com.example.android.bakingguru.RecipeDetailActivity;
 import com.example.android.bakingguru.adapters.RecipeAdapter;
+import com.example.android.bakingguru.database.AppDatabase;
 import com.example.android.bakingguru.database.Recipe;
-import com.example.android.bakingguru.util.MockDataGenerator;
+import com.example.android.bakingguru.model.BakingRecipesPojo;
+import com.example.android.bakingguru.util.Constants;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,14 +26,12 @@ import butterknife.Unbinder;
 
 public class RecipeListFragment extends Fragment implements RecipeAdapter.RecipeAdapterOnClickHandler {
 
-    private static final String SAVE_INSTANCE_GRID_COLS = "save_instance_grid_cols";
-
-    public static final String INTENT_RECIPE_ID = "INTENT_RECIPE_ID";
-
     @BindView(R.id.rv_recipes) RecyclerView mRecyclerView;
     private Unbinder unbinder;
 
+    private AppDatabase mDb;
     private RecipeAdapter mRecipeAdapter;
+    private BakingRecipesPojo mBakingRecipesPojo;
 
     private int mGridCols;
 
@@ -43,20 +45,22 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
+        mDb = AppDatabase.getInstance(getContext());
         unbinder = ButterKnife.bind(this, rootView);
 
         if (savedInstanceState != null) {
-            mGridCols = savedInstanceState.getInt(SAVE_INSTANCE_GRID_COLS);
+            mBakingRecipesPojo = (BakingRecipesPojo) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO);
+            mGridCols = savedInstanceState.getInt(Constants.SAVE_INSTANCE_GRID_COLS);
         }
 
-        GridLayoutManager layoutManager = new GridLayoutManager(rootView.getContext(), mGridCols);
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), mGridCols);
         mRecyclerView.setLayoutManager(layoutManager);
 
         mRecipeAdapter = new RecipeAdapter(this);
         mRecyclerView.setAdapter(mRecipeAdapter);
 
-        mRecipeAdapter.setRecipes(MockDataGenerator.createMockRecipes());
-        mRecipeAdapter.setSteps(MockDataGenerator.createMockSteps());
+        mRecipeAdapter.setRecipes(mBakingRecipesPojo.getRecipes());
+        mRecipeAdapter.setSteps(mBakingRecipesPojo.getSteps());
 
         return rootView;
     }
@@ -65,8 +69,12 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
      * This function sets the number of columns for grid layout
      * @param gridCols Number of columns for the grid layout
      */
-    void setGridCols(int gridCols) {
+    public void setGridCols(int gridCols) {
         mGridCols = gridCols;
+    }
+
+    public void setBakingRecipesPojo(BakingRecipesPojo bakingRecipesPojo) {
+        mBakingRecipesPojo = bakingRecipesPojo;
     }
 
     /**
@@ -76,7 +84,8 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
     @Override
     public void onClick(Recipe recipe) {
         final Intent intent = new Intent(this.getContext(), RecipeDetailActivity.class);
-        intent.putExtra(INTENT_RECIPE_ID, recipe.getId());
+        intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
+        intent.putExtra(Constants.INTENT_RECIPE_ID, recipe.getId());
         startActivity(intent);
     }
 
@@ -85,7 +94,8 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
      */
     @Override
     public void onSaveInstanceState(Bundle currentState) {
-        currentState.putInt(SAVE_INSTANCE_GRID_COLS, mGridCols);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO, mBakingRecipesPojo);
+        currentState.putInt(Constants.SAVE_INSTANCE_GRID_COLS, mGridCols);
     }
 
     @Override

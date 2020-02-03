@@ -9,16 +9,17 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.example.android.bakingguru.database.Step;
+import com.example.android.bakingguru.fragments.RecipeDetailFragment;
+import com.example.android.bakingguru.fragments.StepDetailFragment;
+import com.example.android.bakingguru.model.BakingRecipesPojo;
 import com.example.android.bakingguru.util.AppUtil;
+import com.example.android.bakingguru.util.Constants;
 
 import java.util.ArrayList;
 
 public class StepDetailActivity extends AppCompatActivity {
 
-    private static final String SAVE_INSTANCE_RECIPE_DETAIL_FRAGMENT_CREATED = "save_instance_recipe_detail_fragment_created";
-    private static final String SAVE_INSTANCE_RECIPE_STEPS = "save_instance_recipe_steps";
-    private static final String SAVE_INSTANCE_CURRENT_STEP = "save_instance_current_step";
-
+    private BakingRecipesPojo mBakingRecipesPojo;
     private ArrayList<Step> mRecipeSteps;
     private Step mCurrentStep;
     private boolean mRecipeDetailFragmentCreated;
@@ -28,43 +29,26 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
 
+        if (savedInstanceState != null) {
+            populateSavedInstanceStateData(savedInstanceState);
+        }
+
         if (savedInstanceState == null) {
             // Populate mRecipeSteps and mCurrentStep from the extra data received via intent
             Intent intent = getIntent();
             populateIntentExtras(intent);
 
-            // Add the fragment to its container using a FragmentManager and a Transaction
-            FragmentManager fragmentManager = getSupportFragmentManager();
-
             if (AppUtil.isTabletOrLandscapeView(this)) {
-                RecipeDetailFragment recipeDetailFragment = createRecipeDetailFragment();
-                StepDetailFragment stepDetailFragment = createStepDetailFragment();
-                fragmentManager.beginTransaction()
-                        .add(R.id.recipe_detail_container, recipeDetailFragment)
-                        .add(R.id.step_detail_container, stepDetailFragment)
-                        .commit();
-                mRecipeDetailFragmentCreated = true;
+                createAndAddStepDetailFragment();
+                createAndAddRecipeDetailFragment();
             } else {
-                StepDetailFragment stepDetailFragment = createStepDetailFragment();
-                fragmentManager.beginTransaction()
-                        .add(R.id.step_detail_container, stepDetailFragment)
-                        .commit();
+                createAndAddStepDetailFragment();
                 mRecipeDetailFragmentCreated = false;
             }
         }
-
-        else if (!savedInstanceState.getBoolean(SAVE_INSTANCE_RECIPE_DETAIL_FRAGMENT_CREATED)) {
-            populateSavedInstanceStateData(savedInstanceState);
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            RecipeDetailFragment recipeDetailFragment = createRecipeDetailFragment();
-            fragmentManager.beginTransaction()
-                    .add(R.id.recipe_detail_container, recipeDetailFragment)
-                    .commit();
+        else if (!mRecipeDetailFragmentCreated) {
+            createAndAddRecipeDetailFragment();
             mRecipeDetailFragmentCreated = true;
-        }
-
-        else {
-            populateSavedInstanceStateData(savedInstanceState);
         }
     }
 
@@ -79,20 +63,13 @@ public class StepDetailActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         populateIntentExtras(intent);
-
-        StepDetailFragment stepDetailFragment = createStepDetailFragment();
-
-        // Add the fragment to its container using a FragmentManager and a Transaction
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.step_detail_container, stepDetailFragment)
-                .commit();
+        createAndReplaceStepDetailFragment();
     }
 
     private void populateIntentExtras(Intent intent) {
-        Object recipeStepsListObj = intent.getSerializableExtra(RecipeDetailFragment.INTENT_RECIPE_STEPS);
-        Object currentStepObj = intent.getSerializableExtra(RecipeDetailFragment.INTENT_CURRENT_STEP);
+        mBakingRecipesPojo = (BakingRecipesPojo) intent.getSerializableExtra(Constants.INTENT_BAKING_RECIPES_POJO);
+        Object recipeStepsListObj = intent.getSerializableExtra(Constants.INTENT_RECIPE_STEPS);
+        Object currentStepObj = intent.getSerializableExtra(Constants.INTENT_CURRENT_STEP);
         if (recipeStepsListObj instanceof Object[]) {
             mRecipeSteps = new ArrayList<>();
             for (Object recipeObj : (Object[]) recipeStepsListObj) {
@@ -102,31 +79,53 @@ public class StepDetailActivity extends AppCompatActivity {
         mCurrentStep = (Step) currentStepObj;
     }
 
-    private StepDetailFragment createStepDetailFragment() {
+    private void createAndAddStepDetailFragment() {
         StepDetailFragment stepDetailFragment = new StepDetailFragment();
+        stepDetailFragment.setBakingRecipesPojo(mBakingRecipesPojo);
         stepDetailFragment.setRecipeSteps(mRecipeSteps);
         stepDetailFragment.setCurrentStep(mCurrentStep);
-        return stepDetailFragment;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.step_detail_container, stepDetailFragment)
+                .commit();
     }
 
-    private RecipeDetailFragment createRecipeDetailFragment() {
+    private void createAndReplaceStepDetailFragment() {
+        StepDetailFragment stepDetailFragment = new StepDetailFragment();
+        stepDetailFragment.setBakingRecipesPojo(mBakingRecipesPojo);
+        stepDetailFragment.setRecipeSteps(mRecipeSteps);
+        stepDetailFragment.setCurrentStep(mCurrentStep);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.step_detail_container, stepDetailFragment)
+                .commit();
+    }
+
+    private void createAndAddRecipeDetailFragment() {
         RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        recipeDetailFragment.setBakingRecipesPojo(mBakingRecipesPojo);
         recipeDetailFragment.setRecipeId(mCurrentStep.getRecipeId());
-        return recipeDetailFragment;
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.recipe_detail_container, recipeDetailFragment)
+                .commit();
+        mRecipeDetailFragmentCreated = true;
     }
 
     private void populateSavedInstanceStateData(Bundle savedInstanceState) {
-        mRecipeDetailFragmentCreated = savedInstanceState.getBoolean(SAVE_INSTANCE_RECIPE_DETAIL_FRAGMENT_CREATED);
-        mRecipeSteps = (ArrayList<Step>) savedInstanceState.getSerializable(SAVE_INSTANCE_RECIPE_STEPS);
-        mCurrentStep = (Step) savedInstanceState.getSerializable(SAVE_INSTANCE_CURRENT_STEP);
+        mBakingRecipesPojo = (BakingRecipesPojo) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO);
+        mRecipeDetailFragmentCreated = savedInstanceState.getBoolean(Constants.SAVE_INSTANCE_RECIPE_DETAIL_FRAGMENT_CREATED);
+        mRecipeSteps = (ArrayList<Step>) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_RECIPE_STEPS);
+        mCurrentStep = (Step) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_CURRENT_STEP);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle currentState) {
         super.onSaveInstanceState(currentState);
-        currentState.putBoolean(SAVE_INSTANCE_RECIPE_DETAIL_FRAGMENT_CREATED, mRecipeDetailFragmentCreated);
-        currentState.putSerializable(SAVE_INSTANCE_RECIPE_STEPS, mRecipeSteps);
-        currentState.putSerializable(SAVE_INSTANCE_CURRENT_STEP, mCurrentStep);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO, mBakingRecipesPojo);
+        currentState.putBoolean(Constants.SAVE_INSTANCE_RECIPE_DETAIL_FRAGMENT_CREATED, mRecipeDetailFragmentCreated);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_RECIPE_STEPS, mRecipeSteps);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_CURRENT_STEP, mCurrentStep);
     }
 
     @Override
@@ -134,7 +133,8 @@ public class StepDetailActivity extends AppCompatActivity {
         // Check if Up button is pressed and pass the required intent (i.e. Recipe ID)
         if (item.getItemId() == android.R.id.home) {
             final Intent intent = new Intent(this, RecipeDetailActivity.class);
-            intent.putExtra(RecipeListFragment.INTENT_RECIPE_ID, mCurrentStep.getRecipeId());
+            intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
+            intent.putExtra(Constants.INTENT_RECIPE_ID, mCurrentStep.getRecipeId());
             startActivity(intent);
             return true;
         }

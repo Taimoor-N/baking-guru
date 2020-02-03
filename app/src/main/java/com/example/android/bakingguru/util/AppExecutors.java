@@ -1,4 +1,4 @@
-package com.example.android.bakingguru;
+package com.example.android.bakingguru.util;
 
 /*
  * Copyright (C) 2020 Taimoor Najam

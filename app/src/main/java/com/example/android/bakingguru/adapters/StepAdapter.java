@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.bakingguru.R;
 import com.example.android.bakingguru.database.Step;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -86,8 +87,18 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepAdapterVie
      */
     @Override
     public void onBindViewHolder(@NonNull StepAdapterViewHolder stepAdapterViewHolder, int position) {
-        stepAdapterViewHolder.mStepThumbnail.setImageResource(R.drawable.ic_photo_placeholder_24dp);
         stepAdapterViewHolder.mStepShortDesc.setText(mSteps.get(position).getShortDescription());
+        // Using Picasso to load Step Thumbnail
+        Context context = stepAdapterViewHolder.mStepThumbnail.getContext();
+        String imageUrl = mSteps.get(position).getThumbnailUrl();
+        if (imageUrl.equals("")) {
+            stepAdapterViewHolder.mStepThumbnail.setImageResource(R.drawable.ic_photo_placeholder_recipe_step);
+        } else {
+            Picasso.with(context)
+                    .load(imageUrl)
+                    .error(R.drawable.ic_photo_placeholder_recipe_step)
+                    .into(stepAdapterViewHolder.mStepThumbnail);
+        }
     }
 
     /**

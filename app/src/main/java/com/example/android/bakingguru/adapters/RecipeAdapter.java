@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.android.bakingguru.R;
 import com.example.android.bakingguru.database.Recipe;
 import com.example.android.bakingguru.database.Step;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -91,11 +92,25 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeAdap
      */
     @Override
     public void onBindViewHolder(@NonNull RecipeAdapterViewHolder recipeAdapterViewHolder, int position) {
-        recipeAdapterViewHolder.mRecipeThumbnail.setImageResource(R.drawable.ic_photo_placeholder_24dp);
-        recipeAdapterViewHolder.mRecipeImage.setImageResource(R.drawable.ic_photo_placeholder_24dp);
         recipeAdapterViewHolder.mRecipeTitle.setText(mRecipes.get(position).getName());
         recipeAdapterViewHolder.mRecipeSteps.setText(String.valueOf(getNumOfStepsForRecipe(mRecipes.get(position).getId())));
         recipeAdapterViewHolder.mRecipeServings.setText(String.valueOf(mRecipes.get(position).getServings()));
+        // Using Picasso to load Recipe Thumbnail and Image
+        Context context = recipeAdapterViewHolder.mRecipeImage.getContext();
+        String imageUrl = mRecipes.get(position).getImageUrl();
+        if (imageUrl.equals("")) {
+            recipeAdapterViewHolder.mRecipeImage.setImageResource(R.drawable.ic_photo_placeholder_cake);
+            recipeAdapterViewHolder.mRecipeThumbnail.setImageResource(R.drawable.ic_photo_placeholder_cake);
+        } else {
+            Picasso.with(context)
+                    .load(imageUrl)
+                    .error(R.drawable.ic_photo_placeholder_cake)
+                    .into(recipeAdapterViewHolder.mRecipeThumbnail);
+            Picasso.with(context)
+                    .load(imageUrl)
+                    .error(R.drawable.ic_photo_placeholder_cake)
+                    .into(recipeAdapterViewHolder.mRecipeImage);
+        }
     }
 
     /**

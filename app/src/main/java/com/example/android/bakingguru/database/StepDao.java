@@ -24,6 +24,9 @@ public interface StepDao {
     @Insert
     void insertStep(Step step);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAllSteps(List<Step> steps);
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateStep(Step step);
 

@@ -1,6 +1,7 @@
 package com.example.android.bakingguru.database;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -15,6 +16,9 @@ public class Step implements Serializable {
     private String description;
     private String videoUrl;
     private String thumbnailUrl;
+
+    @Ignore
+    public Step() {}
 
     public Step(int id, int recipeId, String shortDescription, String description, String videoUrl, String thumbnailUrl) {
         this.id = id;

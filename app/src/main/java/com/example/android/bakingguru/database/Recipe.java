@@ -1,6 +1,7 @@
 package com.example.android.bakingguru.database;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -13,6 +14,9 @@ public class Recipe implements Serializable {
     private String name;
     private int servings;
     private String imageUrl;
+
+    @Ignore
+    public Recipe() {}
 
     public Recipe(int id, String name, int servings, String imageUrl) {
         this.id = id;

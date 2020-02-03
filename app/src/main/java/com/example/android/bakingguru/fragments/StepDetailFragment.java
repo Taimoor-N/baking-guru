@@ -16,7 +16,8 @@ import android.widget.TextView;
 import com.example.android.bakingguru.R;
 import com.example.android.bakingguru.StepDetailActivity;
 import com.example.android.bakingguru.database.Step;
-import com.example.android.bakingguru.fragments.RecipeDetailFragment;
+import com.example.android.bakingguru.model.BakingRecipesPojo;
+import com.example.android.bakingguru.util.Constants;
 
 import java.util.ArrayList;
 
@@ -30,14 +31,12 @@ import butterknife.Unbinder;
  */
 public class StepDetailFragment extends Fragment implements View.OnClickListener {
 
-    private static final String SAVE_INSTANCE_RECIPE_STEPS = "save_instance_recipe_steps";
-    private static final String SAVE_INSTANCE_CURRENT_STEP = "save_instance_current_step";
-
     @BindView(R.id.iv_to_be_replaced_by_video) ImageView mStepImage;
     @BindView(R.id.tv_step_detail_description) TextView mStepDescription;
     @BindView(R.id.btn_step_detail_previous) Button mPreviousStepBtn;
     @BindView(R.id.btn_step_detail_next) Button mNextStepBtn;
 
+    private BakingRecipesPojo mBakingRecipesPojo;
     private ArrayList<Step> mRecipeSteps;
     private Step mCurrentStep;
 
@@ -57,8 +56,9 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
         unbinder = ButterKnife.bind(this, rootView);
 
         if (savedInstanceState != null) {
-            mRecipeSteps = (ArrayList<Step>) savedInstanceState.getSerializable(SAVE_INSTANCE_RECIPE_STEPS);
-            mCurrentStep = (Step) savedInstanceState.getSerializable(SAVE_INSTANCE_CURRENT_STEP);
+            mBakingRecipesPojo = (BakingRecipesPojo) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO);
+            mRecipeSteps = (ArrayList<Step>) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_RECIPE_STEPS);
+            mCurrentStep = (Step) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_CURRENT_STEP);
         }
 
         mStepImage.setImageResource(R.drawable.ic_videocam_placeholder_24dp);
@@ -85,6 +85,10 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
         mCurrentStep = currentStep;
     }
 
+    public void setBakingRecipesPojo(BakingRecipesPojo bakingRecipesPojo) {
+        mBakingRecipesPojo = bakingRecipesPojo;
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -107,8 +111,9 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
 
         if (currentStepPosition > 0) {
             final Intent intent = new Intent(this.getContext(), StepDetailActivity.class);
-            intent.putExtra(RecipeDetailFragment.INTENT_RECIPE_STEPS, mRecipeSteps.toArray());
-            intent.putExtra(RecipeDetailFragment.INTENT_CURRENT_STEP, mRecipeSteps.get(currentStepPosition - 1));
+            intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
+            intent.putExtra(Constants.INTENT_RECIPE_STEPS, mRecipeSteps.toArray());
+            intent.putExtra(Constants.INTENT_CURRENT_STEP, mRecipeSteps.get(currentStepPosition - 1));
             startActivity(intent);
         }
     }
@@ -125,8 +130,9 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
 
         if ((currentStepPosition != -1) & (currentStepPosition < (numSteps - 1))) {
             final Intent intent = new Intent(this.getContext(), StepDetailActivity.class);
-            intent.putExtra(RecipeDetailFragment.INTENT_RECIPE_STEPS, mRecipeSteps.toArray());
-            intent.putExtra(RecipeDetailFragment.INTENT_CURRENT_STEP, mRecipeSteps.get(currentStepPosition + 1));
+            intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
+            intent.putExtra(Constants.INTENT_RECIPE_STEPS, mRecipeSteps.toArray());
+            intent.putExtra(Constants.INTENT_CURRENT_STEP, mRecipeSteps.get(currentStepPosition + 1));
             startActivity(intent);
         }
     }
@@ -136,8 +142,9 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
      */
     @Override
     public void onSaveInstanceState(Bundle currentState) {
-        currentState.putSerializable(SAVE_INSTANCE_RECIPE_STEPS, mRecipeSteps);
-        currentState.putSerializable(SAVE_INSTANCE_CURRENT_STEP, mCurrentStep);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO, mBakingRecipesPojo);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_RECIPE_STEPS, mRecipeSteps);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_CURRENT_STEP, mCurrentStep);
     }
 
     @Override

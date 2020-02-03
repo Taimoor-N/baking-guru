@@ -8,11 +8,13 @@ import android.os.Bundle;
 
 import com.example.android.bakingguru.fragments.RecipeDetailFragment;
 import com.example.android.bakingguru.fragments.RecipeListFragment;
+import com.example.android.bakingguru.model.BakingRecipesPojo;
 import com.example.android.bakingguru.util.AppUtil;
+import com.example.android.bakingguru.util.Constants;
 
 public class RecipeDetailActivity extends AppCompatActivity {
 
-    private static final String SAVE_INSTANCE_RECIPE_LIST_FRAGMENT_CREATED = "save_instance_recipe_list_fragment_created";
+    private BakingRecipesPojo mBakingRecipesPojo;
 
     private int mRecipeId;
     private boolean mRecipeListFragmentCreated;
@@ -22,37 +24,25 @@ public class RecipeDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
+        if (savedInstanceState != null) {
+            mBakingRecipesPojo = (BakingRecipesPojo) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO);
+            mRecipeListFragmentCreated = savedInstanceState.getBoolean(Constants.SAVE_INSTANCE_RECIPE_LIST_FRAGMENT_CREATED);
+        }
+
         if (savedInstanceState == null) {
             Intent intent = getIntent();
             populateIntentExtras(intent);
 
-            // Add the fragment to its container using a FragmentManager and a Transaction
-            FragmentManager fragmentManager = getSupportFragmentManager();
-
             if (AppUtil.isTabletOrLandscapeView(this)) {
-                RecipeListFragment recipeListFragment = createRecipeListFragment();
-                RecipeDetailFragment recipeDetailFragment = createRecipeDetailFragment();
-                fragmentManager.beginTransaction()
-                        .add(R.id.recipe_detail_container, recipeDetailFragment)
-                        .add(R.id.recipe_list_container, recipeListFragment)
-                        .commit();
-                mRecipeListFragmentCreated = true;
+                createAndAddRecipeListFragment();
+                createAndAddRecipeDetailFragment();
             } else {
-                RecipeDetailFragment recipeDetailFragment = createRecipeDetailFragment();
-                fragmentManager.beginTransaction()
-                        .add(R.id.recipe_detail_container, recipeDetailFragment)
-                        .commit();
+                createAndAddRecipeDetailFragment();
                 mRecipeListFragmentCreated = false;
             }
         }
-
-        else if (!savedInstanceState.getBoolean(SAVE_INSTANCE_RECIPE_LIST_FRAGMENT_CREATED)) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            RecipeListFragment recipeListFragment = createRecipeListFragment();
-            fragmentManager.beginTransaction()
-                    .add(R.id.recipe_list_container, recipeListFragment)
-                    .commit();
-            mRecipeListFragmentCreated = true;
+        else if (!mRecipeListFragmentCreated) {
+            createAndAddRecipeListFragment();
         }
     }
 
@@ -60,36 +50,50 @@ public class RecipeDetailActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         populateIntentExtras(intent);
+        createAndReplaceRecipeDetailFragment();
+    }
 
-        // Add the fragment to its container using a FragmentManager and a Transaction
+    private void createAndAddRecipeListFragment() {
+        RecipeListFragment recipeListFragment = new RecipeListFragment();
+        recipeListFragment.setBakingRecipesPojo(mBakingRecipesPojo);
+        recipeListFragment.setGridCols(1);
         FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.recipe_list_container, recipeListFragment)
+                .commit();
+        mRecipeListFragmentCreated = true;
+    }
 
-        RecipeDetailFragment recipeDetailFragment = createRecipeDetailFragment();
+    private void createAndAddRecipeDetailFragment() {
+        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        recipeDetailFragment.setBakingRecipesPojo(mBakingRecipesPojo);
+        recipeDetailFragment.setRecipeId(mRecipeId);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.recipe_detail_container, recipeDetailFragment)
+                .commit();
+    }
+
+    private void createAndReplaceRecipeDetailFragment() {
+        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
+        recipeDetailFragment.setBakingRecipesPojo(mBakingRecipesPojo);
+        recipeDetailFragment.setRecipeId(mRecipeId);
+        FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.recipe_detail_container, recipeDetailFragment)
                 .commit();
     }
 
-    private RecipeListFragment createRecipeListFragment() {
-        RecipeListFragment recipeListFragment = new RecipeListFragment();
-        recipeListFragment.setGridCols(1);
-        return recipeListFragment;
-    }
-
-    private RecipeDetailFragment createRecipeDetailFragment() {
-        RecipeDetailFragment recipeDetailFragment = new RecipeDetailFragment();
-        recipeDetailFragment.setRecipeId(mRecipeId);
-        return recipeDetailFragment;
-    }
-
     private void populateIntentExtras(Intent intent) {
-        mRecipeId = intent.getIntExtra(RecipeListFragment.INTENT_RECIPE_ID, -1);
+        mBakingRecipesPojo = (BakingRecipesPojo) intent.getSerializableExtra(Constants.INTENT_BAKING_RECIPES_POJO);
+        mRecipeId = intent.getIntExtra(Constants.INTENT_RECIPE_ID, -1);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle currentState) {
         super.onSaveInstanceState(currentState);
-        currentState.putBoolean(SAVE_INSTANCE_RECIPE_LIST_FRAGMENT_CREATED, mRecipeListFragmentCreated);
+        currentState.putSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO, mBakingRecipesPojo);
+        currentState.putBoolean(Constants.SAVE_INSTANCE_RECIPE_LIST_FRAGMENT_CREATED, mRecipeListFragmentCreated);
     }
 
 }

@@ -1,7 +1,9 @@
 package com.example.android.bakingguru.fragments;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.bakingguru.R;
@@ -18,6 +19,13 @@ import com.example.android.bakingguru.StepDetailActivity;
 import com.example.android.bakingguru.database.Step;
 import com.example.android.bakingguru.model.BakingRecipesPojo;
 import com.example.android.bakingguru.util.Constants;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 
@@ -31,11 +39,12 @@ import butterknife.Unbinder;
  */
 public class StepDetailFragment extends Fragment implements View.OnClickListener {
 
-    @BindView(R.id.iv_to_be_replaced_by_video) ImageView mStepImage;
+    @BindView(R.id.pv_step_detail_video) PlayerView mPlayerView;
     @BindView(R.id.tv_step_detail_description) TextView mStepDescription;
     @BindView(R.id.btn_step_detail_previous) Button mPreviousStepBtn;
     @BindView(R.id.btn_step_detail_next) Button mNextStepBtn;
 
+    private SimpleExoPlayer mExoPlayer;
     private BakingRecipesPojo mBakingRecipesPojo;
     private ArrayList<Step> mRecipeSteps;
     private Step mCurrentStep;
@@ -61,10 +70,11 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
             mCurrentStep = (Step) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_CURRENT_STEP);
         }
 
-        mStepImage.setImageResource(R.drawable.ic_videocam_placeholder_24dp);
         mStepDescription.setText(mCurrentStep.getDescription());
         mPreviousStepBtn.setOnClickListener(this);
         mNextStepBtn.setOnClickListener(this);
+
+        initializePlayer(Uri.parse(mCurrentStep.getVideoUrl()), this.getContext());
 
         return rootView;
     }
@@ -138,6 +148,33 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
     }
 
     /**
+     * Initialize ExoPlayer.
+     * @param mediaUri The URI of the sample to play.
+     */
+    private void initializePlayer(Uri mediaUri, Context context) {
+        if (mExoPlayer == null) {
+            mExoPlayer = new SimpleExoPlayer.Builder(context).build();
+            mPlayerView.setPlayer(mExoPlayer);
+            // Prepare the MediaSource
+            String userAgent = Util.getUserAgent(context, "Baking Guru");
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, userAgent);
+            MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaUri);
+            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.setPlayWhenReady(true);
+        }
+    }
+
+
+    /**
+     * Release ExoPlayer.
+     */
+    private void releasePlayer() {
+        mExoPlayer.stop();
+        mExoPlayer.release();
+        mExoPlayer = null;
+    }
+
+    /**
      * Save the current state of this fragment
      */
     @Override
@@ -150,6 +187,7 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        releasePlayer();
         unbinder.unbind();
     }
 

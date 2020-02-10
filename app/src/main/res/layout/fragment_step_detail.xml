@@ -1,58 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp"
-    tools:context=".fragments.StepDetailFragment">
+    android:layout_centerHorizontal="true"
+    android:columnCount="2">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
+        android:id="@+id/scrollView4"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@+id/btn_step_detail_previous"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".fragments.StepDetailFragment">
 
-        <ImageView
-            android:id="@+id/iv_to_be_replaced_by_video"
+        <!-- This is required for Exoplayer to adjust its height according to the video height -->
+        <com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+            android:id="@+id/arfl_step_detail_video_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/content_description_recipe_card_thumbnail"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:src="@drawable/ic_videocam_placeholder_24dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:resize_mode="fixed_width">
 
-        <TextView
-            android:id="@+id/tv_step_detail_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="@string/placeholder_step_detail_description"
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv_to_be_replaced_by_video" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btn_step_detail_previous"
-            android:layout_width="150dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/placeholder_step_detail_button_previous"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_step_detail_description" />
+                <com.google.android.exoplayer2.ui.PlayerView
+                    android:id="@+id/pv_step_detail_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
+                    android:background="@android:color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:resize_mode="fixed_width" />
 
-        <Button
-            android:id="@+id/btn_step_detail_next"
-            android:layout_width="150dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/placeholder_step_detail_button_next"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_step_detail_description" />
+                <TextView
+                    android:id="@+id/tv_step_detail_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/placeholder_step_detail_description"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/pv_step_detail_video" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-</ScrollView>
+        </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_step_detail_previous"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:text="@string/placeholder_step_detail_button_previous"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_step_detail_next"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_step_detail_next"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:text="@string/placeholder_step_detail_button_next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_step_detail_previous" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

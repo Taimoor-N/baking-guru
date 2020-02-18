@@ -81,8 +81,8 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
         }
 
         mStepDescription.setText(mCurrentStep.getDescription());
-        mPreviousStepBtn.setOnClickListener(this);
-        mNextStepBtn.setOnClickListener(this);
+        initializePrevStepBtn();
+        initializeNextStepBtn();
 
         String videoUrl = mCurrentStep.getVideoUrl();
         if (videoUrl != null && !videoUrl.equals("")) {
@@ -149,15 +149,7 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
     }
 
     private void previousButtonClick() {
-        int numSteps = mRecipeSteps.size();
-        int currentStepPosition = -1;
-        for (int i=0; i<numSteps; i++) {
-            if (mRecipeSteps.get(i).getId() == mCurrentStep.getId()) {
-                currentStepPosition = i;
-                break;
-            }
-        }
-
+        int currentStepPosition = getCurrentRecipeStepPosition();
         if (currentStepPosition > 0) {
             final Intent intent = new Intent(this.getContext(), StepDetailActivity.class);
             intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
@@ -168,21 +160,40 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
     }
 
     private void nextButtonClick() {
-        int numSteps = mRecipeSteps.size();
-        int currentStepPosition = -1;
-        for (int i=0; i<numSteps; i++) {
-            if (mRecipeSteps.get(i).getId() == mCurrentStep.getId()) {
-                currentStepPosition = i;
-                break;
-            }
-        }
-
-        if ((currentStepPosition != -1) & (currentStepPosition < (numSteps - 1))) {
+        int currentStepPosition = getCurrentRecipeStepPosition();
+        if ((currentStepPosition != -1) & (currentStepPosition < (mRecipeSteps.size() - 1))) {
             final Intent intent = new Intent(this.getContext(), StepDetailActivity.class);
             intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
             intent.putExtra(Constants.INTENT_RECIPE_STEPS, mRecipeSteps.toArray());
             intent.putExtra(Constants.INTENT_CURRENT_STEP, mRecipeSteps.get(currentStepPosition + 1));
             startActivity(intent);
+        }
+    }
+
+    private int getCurrentRecipeStepPosition() {
+        for (int i=0; i<mRecipeSteps.size(); i++) {
+            if (mRecipeSteps.get(i).getId() == mCurrentStep.getId()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void initializePrevStepBtn() {
+        if (getCurrentRecipeStepPosition() <= 0) {
+            mPreviousStepBtn.setVisibility(View.INVISIBLE);
+        } else {
+            mPreviousStepBtn.setVisibility(View.VISIBLE);
+            mPreviousStepBtn.setOnClickListener(this);
+        }
+    }
+
+    private void initializeNextStepBtn() {
+        if (getCurrentRecipeStepPosition() >= (mRecipeSteps.size() - 1)) {
+            mNextStepBtn.setVisibility(View.INVISIBLE);
+        } else {
+            mNextStepBtn.setVisibility(View.VISIBLE);
+            mNextStepBtn.setOnClickListener(this);
         }
     }
 

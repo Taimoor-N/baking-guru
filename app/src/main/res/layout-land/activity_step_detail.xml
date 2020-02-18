@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
-    tools:context=".StepDetailActivity">
+    tools:context=".StepDetailActivity"
+    android:background="@color/colorPrimaryLight">
 
     <FrameLayout
         android:id="@+id/recipe_detail_container"

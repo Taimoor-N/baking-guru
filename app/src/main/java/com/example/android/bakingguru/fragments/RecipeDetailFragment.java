@@ -91,6 +91,9 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
             if (numOfIngredients > 1 && i < (numOfIngredients - 1)){
                 recipeIngredients += ", ";
             }
+            if (i == (numOfIngredients - 1)) {
+                recipeIngredients += ".";
+            }
         }
 
         return recipeIngredients;

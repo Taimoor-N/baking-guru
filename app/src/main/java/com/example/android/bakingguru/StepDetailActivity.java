@@ -38,7 +38,7 @@ public class StepDetailActivity extends AppCompatActivity {
             Intent intent = getIntent();
             populateIntentExtras(intent);
 
-            if (AppUtil.isTabletOrLandscapeView(this)) {
+            if (AppUtil.isTabletView(this)) {
                 createAndAddStepDetailFragment();
                 createAndAddRecipeDetailFragment();
             } else {
@@ -46,7 +46,7 @@ public class StepDetailActivity extends AppCompatActivity {
                 mRecipeDetailFragmentCreated = false;
             }
         }
-        else if (!mRecipeDetailFragmentCreated) {
+        else if (AppUtil.isTabletView(this) && !mRecipeDetailFragmentCreated) {
             createAndAddRecipeDetailFragment();
             mRecipeDetailFragmentCreated = true;
         }

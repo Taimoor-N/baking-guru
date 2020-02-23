@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the number of grid columns for RecipeListFragment
         if (AppUtil.isLandscapeView()) {
+            recipeListFragment.setGridCols(3);
+        } else if (AppUtil.isTabletView(this)) {
             recipeListFragment.setGridCols(2);
         } else {
             recipeListFragment.setGridCols(1);

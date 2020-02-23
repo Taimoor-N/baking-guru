@@ -16,7 +16,7 @@
 
         <ImageView
             android:id="@+id/iv_recipe_card_thumbnail"
-            android:layout_height="80dp"
+            android:layout_height="50dp"
             android:layout_width="wrap_content"
             android:adjustViewBounds="true"
             android:padding="8dp"
@@ -28,12 +28,12 @@
         <TextView
             android:id="@+id/tv_recipe_card_title"
             android:layout_width="wrap_content"
-            android:layout_height="80dp"
+            android:layout_height="50dp"
             android:padding="8dp"
             android:text="@string/placeholder_recipe_card_name"
             android:gravity="center_vertical"
+            android:textSize="16sp"
             android:textColor="@android:color/black"
-            android:textSize="36sp"
             app:layout_constraintStart_toEndOf="@+id/iv_recipe_card_thumbnail"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,6 +41,7 @@
             android:id="@+id/iv_recipe_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/content_description_recipe_card_thumbnail"
             android:src="@drawable/ic_photo_placeholder_24dp"
@@ -56,7 +57,7 @@
             android:paddingStart="24dp"
             android:paddingEnd="4dp"
             android:text="@string/recipe_card_steps_text"
-            android:textSize="20sp"
+            android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_recipe_card" />
 
@@ -69,7 +70,7 @@
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
             android:text="@string/placeholder_recipe_card_steps_value"
-            android:textSize="20sp"
+            android:textSize="12sp"
             app:layout_constraintStart_toEndOf="@+id/tv_recipe_card_steps_text"
             app:layout_constraintTop_toBottomOf="@+id/iv_recipe_card" />
 
@@ -82,7 +83,7 @@
             android:paddingEnd="4dp"
             android:paddingBottom="24dp"
             android:text="@string/recipe_card_servings_text"
-            android:textSize="20sp"
+            android:textSize="12sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_recipe_card_steps_text" />
 
@@ -95,7 +96,7 @@
             android:paddingEnd="8dp"
             android:paddingBottom="24dp"
             android:text="@string/placeholder_recipe_card_servings_value"
-            android:textSize="20sp"
+            android:textSize="12sp"
             app:layout_constraintStart_toEndOf="@+id/tv_recipe_card_servings_text"
             app:layout_constraintTop_toBottomOf="@+id/tv_recipe_card_steps_text" />
 

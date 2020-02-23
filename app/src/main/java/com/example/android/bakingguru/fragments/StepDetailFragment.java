@@ -1,11 +1,13 @@
 package com.example.android.bakingguru.fragments;
 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.support.v4.media.session.MediaSessionCompat;
@@ -14,18 +16,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.bakingguru.R;
 import com.example.android.bakingguru.StepDetailActivity;
 import com.example.android.bakingguru.database.Step;
 import com.example.android.bakingguru.model.BakingRecipesPojo;
+import com.example.android.bakingguru.util.AppUtil;
 import com.example.android.bakingguru.util.Constants;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -53,12 +61,20 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
     private SimpleExoPlayer mExoPlayer;
     private MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
+    private Dialog mPlayerFullScreenDialog;
+    private ImageView mPlayerFullScreenIcon;
+    private FrameLayout mPlayerFullScreenButton;
+
+    private Boolean mPlayerFullScreenInd = false;
+    private int mPlayerResumeWindow;
+    private long mPlayerResumePosition;
 
     private BakingRecipesPojo mBakingRecipesPojo;
     private ArrayList<Step> mRecipeSteps;
     private Step mCurrentStep;
 
     private Unbinder unbinder;
+
 
 
     public StepDetailFragment() {
@@ -78,6 +94,9 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
             mBakingRecipesPojo = (BakingRecipesPojo) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO);
             mRecipeSteps = (ArrayList<Step>) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_RECIPE_STEPS);
             mCurrentStep = (Step) savedInstanceState.getSerializable(Constants.SAVE_INSTANCE_CURRENT_STEP);
+            mPlayerResumeWindow = savedInstanceState.getInt(Constants.SAVE_INSTANCE_PLAYER_RESUME_WINDOW);
+            mPlayerResumePosition = savedInstanceState.getLong(Constants.SAVE_INSTANCE_PLAYER_RESUME_POSITION);
+            mPlayerFullScreenInd = savedInstanceState.getBoolean(Constants.SAVE_INSTANCE_PLAYER_FULLSCREEN_IND);
         }
 
         mStepDescription.setText(mCurrentStep.getDescription());
@@ -93,6 +112,11 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
             hidePlayer();
         }
 
+        if (AppUtil.isLandscapeView() && mExoPlayer != null && mPlayerView.getPlayer() != null) {
+            mPlayerFullScreenInd = true;
+            openFullscreenDialog();
+        }
+
         return rootView;
     }
 
@@ -104,14 +128,27 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
         currentState.putSerializable(Constants.SAVE_INSTANCE_BAKING_RECIPE_POJO, mBakingRecipesPojo);
         currentState.putSerializable(Constants.SAVE_INSTANCE_RECIPE_STEPS, mRecipeSteps);
         currentState.putSerializable(Constants.SAVE_INSTANCE_CURRENT_STEP, mCurrentStep);
+        currentState.putInt(Constants.SAVE_INSTANCE_PLAYER_RESUME_WINDOW, mPlayerResumeWindow);
+        currentState.putLong(Constants.SAVE_INSTANCE_PLAYER_RESUME_POSITION, mPlayerResumePosition);
+        currentState.putBoolean(Constants.SAVE_INSTANCE_PLAYER_FULLSCREEN_IND, mPlayerFullScreenInd);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mExoPlayer != null && mPlayerView.getPlayer() != null) {
+            mPlayerResumeWindow = mPlayerView.getPlayer().getCurrentWindowIndex();
+            mPlayerResumePosition = mPlayerView.getPlayer().getContentPosition();
+        }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mExoPlayer != null) {
-            releasePlayer();
+        if (mPlayerFullScreenDialog != null) {
+            closeFullscreenDialog();
         }
+        releasePlayer();
         if (mMediaSession != null) {
             mMediaSession.setActive(false);
         }
@@ -249,6 +286,9 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
         if (mExoPlayer == null) {
             mExoPlayer = new SimpleExoPlayer.Builder(context).build();
             mPlayerView.setPlayer(mExoPlayer);
+            // Initialize full screen dialog and button for ExoPlayer
+            initFullscreenDialog();
+            initFullscreenButton();
             // Set the ExoPlayer.EventListener to this activity
             mExoPlayer.addListener(this);
             // Prepare the MediaSource
@@ -257,6 +297,12 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
             MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaUri);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
+            // Resume video at T - 100ms if it was playing and current position was > 100ms.
+            // 100ms (0.1sec) is used to overcome a bug in ExoPlayer where video stops responding
+            // if resumed at the end of video duration.
+            if (mPlayerResumeWindow != C.INDEX_UNSET && mPlayerResumePosition > 100) {
+                mPlayerView.getPlayer().seekTo(mPlayerResumeWindow, mPlayerResumePosition - 100);
+            }
         }
     }
 
@@ -264,9 +310,11 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
      * Release ExoPlayer.
      */
     private void releasePlayer() {
-        mExoPlayer.stop();
-        mExoPlayer.release();
-        mExoPlayer = null;
+        if (mExoPlayer != null && mPlayerView.getPlayer() != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     /**
@@ -336,4 +384,58 @@ public class StepDetailFragment extends Fragment implements View.OnClickListener
             mExoPlayer.seekTo(0);
         }
     }
+
+    /**
+     * This function allows the user to exit player's fullscreen mode by either pressing the shrink
+     * button in the lower right of their screen, or by using their device’s back button.
+     */
+    private void initFullscreenDialog() {
+        mPlayerFullScreenDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen) {
+            public void onBackPressed() {
+                if (mPlayerFullScreenInd)
+                    closeFullscreenDialog();
+                super.onBackPressed();
+            }
+        };
+    }
+
+    /**
+     * This method removes the PlayerView from the activity, and adds a new instance of
+     * the view to the fullscreen dialog.
+     */
+    private void openFullscreenDialog() {
+        ((ViewGroup) mPlayerView.getParent()).removeView(mPlayerView);
+        mPlayerFullScreenDialog.addContentView(mPlayerView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mPlayerFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_fullscreen_skrink));
+        mPlayerFullScreenInd = true;
+        mPlayerFullScreenDialog.show();
+    }
+
+    /**
+     * This method adds a new PlayerView to the activity, removes the view from the fullscreen
+     * dialog, and dismisses the dialog.
+     */
+    private void closeFullscreenDialog() {
+        ((ViewGroup) mPlayerView.getParent()).removeView(mPlayerView);
+        ((AspectRatioFrameLayout) getActivity().findViewById(R.id.arfl_step_detail_video_container)).addView(mPlayerView);
+        mPlayerFullScreenInd = false;
+        mPlayerFullScreenDialog.dismiss();
+        mPlayerFullScreenIcon.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_fullscreen_expand));
+    }
+
+    /**
+     * This method initializes the full screen button.
+     */
+    private void initFullscreenButton() {
+        PlayerControlView controlView = mPlayerView.findViewById(R.id.exo_controller);
+        mPlayerFullScreenIcon = controlView.findViewById(R.id.exo_fullscreen_icon);
+        mPlayerFullScreenButton = controlView.findViewById(R.id.exo_fullscreen_button);
+        mPlayerFullScreenButton.setOnClickListener((View v) -> {
+            if (!mPlayerFullScreenInd)
+                openFullscreenDialog();
+            else
+                closeFullscreenDialog();
+        });
+    }
+
 }

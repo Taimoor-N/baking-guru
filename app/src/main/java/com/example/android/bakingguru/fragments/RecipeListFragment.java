@@ -19,6 +19,7 @@ import com.example.android.bakingguru.database.AppDatabase;
 import com.example.android.bakingguru.database.Recipe;
 import com.example.android.bakingguru.model.BakingRecipesPojo;
 import com.example.android.bakingguru.util.Constants;
+import com.example.android.bakingguru.widgets.RecipeIngredientService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -83,6 +84,9 @@ public class RecipeListFragment extends Fragment implements RecipeAdapter.Recipe
      */
     @Override
     public void onClick(Recipe recipe) {
+        // Update the widget to display the selected recipe
+        RecipeIngredientService.startActionUpdateRecipeIngredientWidget(getContext(), mBakingRecipesPojo, recipe.getId());
+        // Intent for RecipeDetailActivity
         final Intent intent = new Intent(this.getContext(), RecipeDetailActivity.class);
         intent.putExtra(Constants.INTENT_BAKING_RECIPES_POJO, mBakingRecipesPojo);
         intent.putExtra(Constants.INTENT_RECIPE_ID, recipe.getId());

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Baking Guru</string>
+    <string name="content_description_ingredient_widget">Baking Guru Ingredients Widget</string>
     <string name="content_description_recipe_card_thumbnail">This image shows recipe thumbnail</string>
     <string name="content_description_step_thumbnail">This image shows thumbnail for recipe preparation step</string>
     <string name="placeholder_recipe_card_name">Cheesecake</string>

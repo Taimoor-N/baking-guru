@@ -2,6 +2,9 @@ package com.example.android.bakingguru.util;
 
 public class Constants {
 
+    // Constants for Services
+    public static final String ACTION_UPDATE_INGREDIENT_WIDGET = "ACTION_UPDATE_INGREDIENT_WIDGET";
+
     // Constants for SavedInstanceState
     public static final String SAVE_INSTANCE_BAKING_RECIPE_POJO = "SAVE_INSTANCE_BAKING_RECIPE_POJO";
     public static final String SAVE_INSTANCE_CURRENT_STEP = "SAVE_INSTANCE_CURRENT_STEP";

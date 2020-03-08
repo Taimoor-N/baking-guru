@@ -19,6 +19,7 @@ import com.example.android.bakingguru.adapters.StepAdapter;
 import com.example.android.bakingguru.database.Ingredient;
 import com.example.android.bakingguru.database.Step;
 import com.example.android.bakingguru.model.BakingRecipesPojo;
+import com.example.android.bakingguru.util.AppUtil;
 import com.example.android.bakingguru.util.Constants;
 
 import java.util.ArrayList;
@@ -68,35 +69,9 @@ public class RecipeDetailFragment extends Fragment implements StepAdapter.StepAd
 
         mStepAdapter.setSteps(getRecipeSteps(mRecipeId));
 
-        mRecipeIngredients.setText(getRecipeIngredients(mRecipeId));
+        mRecipeIngredients.setText(AppUtil.getRecipeIngredients(this.getContext(), mBakingRecipesPojo, mRecipeId));
 
         return rootView;
-    }
-
-    private String getRecipeIngredients(int recipeId) {
-        ArrayList<Ingredient> ingredients = mBakingRecipesPojo.getIngredients();
-        ArrayList<Ingredient> matchingIngredients = new ArrayList<>();
-        String recipeIngredients = "";
-
-        // Isolate ingredients that match with the Recipe ID
-        for (Ingredient ingredient : ingredients) {
-            if (ingredient.getRecipeId() == recipeId) {
-                matchingIngredients.add(ingredient);
-            }
-        }
-
-        int numOfIngredients = matchingIngredients.size();
-        for (int i=0; i<numOfIngredients; i++) {
-            recipeIngredients += getString(R.string.recipe_detail_ingredients, matchingIngredients.get(i).getQuantity(), matchingIngredients.get(i).getMeasure(), matchingIngredients.get(i).getName());
-            if (numOfIngredients > 1 && i < (numOfIngredients - 1)){
-                recipeIngredients += ", ";
-            }
-            if (i == (numOfIngredients - 1)) {
-                recipeIngredients += ".";
-            }
-        }
-
-        return recipeIngredients;
     }
 
     private ArrayList<Step> getRecipeSteps(int recipeId) {

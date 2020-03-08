@@ -13,6 +13,7 @@ import com.example.android.bakingguru.util.AppExecutors;
 import com.example.android.bakingguru.util.AppUtil;
 import com.example.android.bakingguru.util.JsonUtils;
 import com.example.android.bakingguru.util.NetworkUtils;
+import com.example.android.bakingguru.widgets.RecipeIngredientService;
 
 import java.net.URL;
 
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     mDb.ingredientDao().insertAllIngredients(bakingRecipesPojo.getIngredients());
                     mDb.stepDao().insertAllSteps(bakingRecipesPojo.getSteps());
                     createAndAddRecipeListFragment(bakingRecipesPojo);
+                    RecipeIngredientService.startActionUpdateRecipeIngredientWidget(getBaseContext(), bakingRecipesPojo, -1);
                 });
             }
         }
